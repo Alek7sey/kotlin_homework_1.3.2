@@ -6,31 +6,69 @@ const val minComissionVisaMir = 35
 const val comissionFixMasterMaestro = 20
 const val comissionMasterMaestro = 0.006
 const val limitTransferMasterMaestro = 75_000
+const val cardLimitDay = 150_000
+const val cardLimitMonth = 600_000
+const val VKPayLimitTransaction = 15_000
+const val VKPayLimitMonth = 40_000
 
 fun main() {
 
-    val sumTransfer1 = 20_000
-    val transfer1 = 150
-    val sumTransfer2 = 65_000
-    val transfer2 = 10100
+    calcComission(sumTransfer = 10_000, transfer = 15_000)
+    calcComission("Maestro", 80_000, 1_000)
+    calcComission("Visa", 100_000, 200_000)
+    calcComission("Mir", 600_000, 50_000)
 
-    val amount1 = calcComission("", sumTransfer1, transfer1)
-    val amount2 = calcComission("Maestro", sumTransfer2, transfer2)
-    println("Перевод на сумму $transfer1 руб. Размер комиссии составит $amount1 руб.")
-    println("Перевод на сумму $transfer2 руб. Размер комиссии составит $amount2 руб.")
 }
 
-fun calcComission(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int): Int {
+fun calcComission(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int) {
     var result = 0
 
-    when (typeCard) {
-        "Mastercard", "Maestro" -> {
-            if ((sumTransfer + transfer) > limitTransferMasterMaestro) {
-                result = (transfer * comissionMasterMaestro + comissionFixMasterMaestro).roundToInt()
+    val permission = possibleTransfer(typeCard, sumTransfer, transfer)
+    when (permission) {
+        1 -> {
+            when (typeCard) {
+                "Mastercard", "Maestro" -> {
+                    if ((sumTransfer + transfer) > limitTransferMasterMaestro) {
+                        result = (transfer * comissionMasterMaestro + comissionFixMasterMaestro).roundToInt()
+                        println("Перевод на сумму $transfer руб. Размер комиссии составит $result руб.")
+                    }
+                }
+
+                "Visa", "Mir" -> {
+                    result = max((transfer * comissionVisaMir).roundToInt(), minComissionVisaMir)
+                    println("Перевод на сумму $transfer руб. Размер комиссии составит $result руб.")
+                }
+
+                else -> println("Перевод на сумму $transfer руб. Размер комиссии составит $result руб.")
             }
         }
 
-        "Visa", "Mir" -> result = max((transfer * comissionVisaMir).roundToInt(), minComissionVisaMir)
+        -1 -> println("Перевод невозможен! Превышен лимит суточного/разового перевода")
+        -2 -> println("Перевод невозможен! Превышен лимит месячного перевода")
     }
-    return result
+}
+
+fun possibleTransfer(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int): Int {
+    var signTransfer = 1
+    when (typeCard) {
+        "VK Pay" -> {
+            if (transfer > VKPayLimitTransaction) {
+                signTransfer = -1
+            }
+            if ((sumTransfer + transfer) > VKPayLimitMonth) {
+                signTransfer = -2
+            }
+        }
+
+        else -> {
+            if (transfer > cardLimitDay) {
+                signTransfer = -1
+            }
+            if ((sumTransfer + transfer) > cardLimitMonth) {
+                signTransfer = -2
+            }
+        }
+    }
+
+    return signTransfer
 }
