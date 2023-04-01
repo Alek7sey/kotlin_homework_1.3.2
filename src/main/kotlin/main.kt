@@ -13,14 +13,18 @@ const val VKPayLimitMonth = 40_000
 
 fun main() {
 
-    calcComission(sumTransfer = 10_000, transfer = 15_000)
-    calcComission("Maestro", 80_000, 1_000)
-    calcComission("Visa", 100_000, 200_000)
-    calcComission("Mir", 600_000, 50_000)
+    val typeCard1 = "Maestro"
+    val sumTransfer2 = 80_000
+    val transfer2 = 1_000
+
+    printComission(sumTransfer = 10_000, transfer = 15_000)
+    printComission(typeCard1, sumTransfer2, transfer2)
+    printComission("Visa", 100_000, 200_000)
+    printComission("Mir", 600_000, 50_000)
 
 }
 
-fun calcComission(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int) {
+fun calcComission(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int): Int {
     var result = 0
 
     val permission = possibleTransfer(typeCard, sumTransfer, transfer)
@@ -30,22 +34,19 @@ fun calcComission(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: I
                 "Mastercard", "Maestro" -> {
                     if ((sumTransfer + transfer) > limitTransferMasterMaestro) {
                         result = (transfer * comissionMasterMaestro + comissionFixMasterMaestro).roundToInt()
-                        println("Перевод на сумму $transfer руб. Размер комиссии составит $result руб.")
                     }
                 }
 
                 "Visa", "Mir" -> {
                     result = max((transfer * comissionVisaMir).roundToInt(), minComissionVisaMir)
-                    println("Перевод на сумму $transfer руб. Размер комиссии составит $result руб.")
                 }
-
-                else -> println("Перевод на сумму $transfer руб. Размер комиссии составит $result руб.")
             }
         }
 
-        -1 -> println("Перевод невозможен! Превышен лимит суточного/разового перевода")
-        -2 -> println("Перевод невозможен! Превышен лимит месячного перевода")
+        -1 -> result = -1
+        -2 -> result = -2
     }
+    return result
 }
 
 fun possibleTransfer(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int): Int {
@@ -71,4 +72,12 @@ fun possibleTransfer(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer
     }
 
     return signTransfer
+}
+
+fun printComission(typeCard: String = "VK Pay", sumTransfer: Int = 0, transfer: Int) {
+    when (val result = calcComission(typeCard, sumTransfer, transfer)) {
+        -1 -> println("Перевод $typeCard невозможен! Превышен лимит суточного/разового перевода")
+        -2 -> println("Перевод $typeCard невозможен! Превышен лимит месячного перевода")
+        else -> println("Перевод $typeCard на сумму $transfer руб. Размер комиссии составит $result руб.")
+    }
 }
