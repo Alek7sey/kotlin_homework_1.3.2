@@ -5,34 +5,21 @@ class MainKtTest {
 
     @Test
     fun calcComissionMaestro1() {
-        val result1 = calcComission("Maestro", 100_000, 35_000)
-        assertEquals(230, result1)
+        val result = calcComission("Maestro", 100_000, 35_000)
+        assertEquals(230, result)
     }
 
     @Test
     fun calcComissionMaestro2() {
-        val result2 = calcComission("Maestro", 10_000, 2_000)
-        assertEquals(0, result2)
-    }
-
-    @Test
-    fun calcComissionMir() {
-        val result = calcComission("Mir", 50_000, 10_000)
-        assertEquals(75, result)
-    }
-
-    @Test
-    fun calcComissionVisa() {
-        val result = calcComission("Visa", 35_000, 20_000)
-        assertEquals(150, result)
-    }
-
-    @Test
-    fun calcComissionVKPayDefault() {
-        val result = calcComission(sumTransfer = 10_000, transfer = 1_000)
+        val result = calcComission("Maestro", 10_000, 2_000)
         assertEquals(0, result)
     }
 
+    @Test
+    fun calcComissionMaestro3() {
+        val result = calcComission("Maestro", 100, 50)
+        assertEquals(20, result)
+    }
 
     @Test
     fun calcComissionMastercard1() {
@@ -44,6 +31,30 @@ class MainKtTest {
     fun calcComissionMastercard2() {
         val result2 = calcComission("Mastercard", 100_000, 1_000)
         assertEquals(26, result2)
+    }
+
+    @Test
+    fun calcComissionMastercard3() {
+        val result = calcComission("Maestro", 100, 50)
+        assertEquals(20, result)
+    }
+
+    @Test
+    fun calcComissionVisa() {
+        val result = calcComission("Visa", 35_000, 20_000)
+        assertEquals(150, result)
+    }
+
+    @Test
+    fun calcComissionMir() {
+        val result = calcComission("Mir", 50_000, 10_000)
+        assertEquals(75, result)
+    }
+
+    @Test
+    fun calcComissionVKPayDefault() {
+        val result = calcComission(sumTransfer = 10_000, transfer = 1_000)
+        assertEquals(0, result)
     }
 
     @Test
